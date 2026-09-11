@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Audio Poem</title>
+    <style>
+        /* Classic 2000s Web Styling */
+        body {
+            background-color: #008080;
+            background-image: repeating-linear-gradient(45deg, #007373 0, #007373 10px, #008080 10px, #008080 20px);
+            margin: 0;
+            padding: 20px;
+            font-family: "Times New Roman", Times, serif;
+            color: #000;
+        }
+
+        #page-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #c0c0c0;
+            border: 4px outset #ffffff;
+            padding: 10px;
+        }
+
+        #inner-frame {
+            background-color: #ffffff;
+            border: 2px inset #7b7b7b;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Fake 10-Second Loading Screen */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #008080;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .loading-box {
+            background: #c0c0c0;
+            border: 3px outset #ffffff;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
+            width: 320px;
+        }
+
+        .loading-box h1 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #000080;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background: #ffffff;
+            border: 2px inset #7b7b7b;
+            margin-top: 15px;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: #000080;
+        }
+
+        /* Snap-reveal Overlays */
+        .snap-tile {
+            position: absolute;
+            background-color: #ffffff;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        #tile-half { top: 0; left: 0; width: 50%; height: 100%; }
+        #tile-quarter { top: 0; right: 0; width: 25%; height: 100%; }
+        #tile-eighth-1 { top: 0; left: 50%; width: 12.5%; height: 100%; }
+        #tile-eighth-2 { top: 0; left: 62.5%; width: 12.5%; height: 100%; }
+
+        /* Main Content */
+        #main-content {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .header-banner {
+            background: #000080;
+            color: #ffff00;
+            padding: 8px;
+            font-weight: bold;
+            font-size: 22px;
+            margin-bottom: 25px;
+            border: 2px solid #000;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Poem Display Area */
+        .poem-container {
+            font-size: 24px;
+            line-height: 2.2;
+            margin: 20px 0;
+            background: #fff8dc;
+            border: 2px solid #000;
+            padding: 25px;
+            width: 80%;
+            text-align: center;
+        }
+
+        .poem-line {
+            display: block;
+            cursor: pointer;
+            padding: 4px 8px;
+            margin: 4px 0;
+            border: 1px transparent solid;
+            transition: background-color 0.1s ease;
+        }
+
+        .poem-line:hover {
+            background-color: #ffff00;
+            border: 1px dotted #000;
+            color: #cc0000;
+        }
+
+        .poem-line.playing {
+            background-color: #ffff00;
+            border: 1px solid #000;
+            color: #cc0000;
+        }
+
+        .controls {
+            margin-top: 15px;
+        }
+
+        .btn {
+            background: #c0c0c0;
+            border: 2px outset #ffffff;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: "Times New Roman", serif;
+        }
+
+        .btn:active {
+            border-style: inset;
+        }
+
+        .site-footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #555;
+            border-top: 1px dashed #7b7b7b;
+            padding-top: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading-screen">
+        <div class="loading-box">
+            <h1>LOADING AUDIO MODULE...</h1>
+            <p id="loading-status">Initializing TTS engine...</p>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-wrapper">
+        <div id="inner-frame">
+            
+            <!-- Snap-reveal overlays -->
+            <div class="snap-tile" id="tile-half"></div>
+            <div class="snap-tile" id="tile-quarter"></div>
+            <div class="snap-tile" id="tile-eighth-1"></div>
+            <div class="snap-tile" id="tile-eighth-2"></div>
+
+            <div id="main-content">
+                <div class="header-banner">
+                    *** INTERACTIVE POEM PLAYER ***
+                </div>
+
+                <div class="poem-container">
+                    <span class="poem-line" data-audio="audio/line1.mp3">Devour found a lonely ape</span>
+                    <span class="poem-line" data-audio="audio/line2.mp3">Chewed his guts like bone</span>
+                    <span class="poem-line" data-audio="audio/line3.mp3">Swallowed raw inside his deep</span>
+                    <span class="poem-line" data-audio="audio/line4.mp3">Left him all alone</span>
+                    <span class="poem-line" data-audio="audio/line5.mp3">Blood was clotting in his veins</span>
+                    <span class="poem-line" data-audio="audio/line6.mp3">Curdling with a groan</span>
+                </div>
+
+                <div class="controls">
+                    <button class="btn" id="play-full-btn">PLAY FULL POEM</button>
+                </div>
+
+                <div class="site-footer">
+                    <p>Click any line to listen to that verse.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const loadingScreen = document.getElementById('loading-screen');
+        const progressBar = document.getElementById('progress-bar');
+        const loadingStatus = document.getElementById('loading-status');
+        const mainContent = document.getElementById('main-content');
+        const playFullBtn = document.getElementById('play-full-btn');
+
+        const tileHalf = document.getElementById('tile-half');
+        const tileQuarter = document.getElementById('tile-quarter');
+        const tileEighth1 = document.getElementById('tile-eighth-1');
+        const tileEighth2 = document.getElementById('tile-eighth-2');
+
+        const lines = document.querySelectorAll('.poem-line');
+        let currentAudio = null;
+
+        // 10-Second Loading Logic
+        let progress = 0;
+        const loadInterval = setInterval(() => {
+            progress += 1;
+            progressBar.style.width = progress + '%';
+
+            if (progress === 30) {
+                loadingStatus.textContent = 'Preloading audio clips...';
+            } else if (progress === 70) {
+                loadingStatus.textContent = 'Building phrase layout...';
+            } else if (progress >= 100) {
+                clearInterval(loadInterval);
+                startSnapReveal();
+            }
+        }, 100);
+
+        function startSnapReveal() {
+            loadingScreen.style.display = 'none';
+            mainContent.style.display = 'flex';
+
+            setTimeout(() => { tileHalf.style.display = 'none'; }, 100);
+            setTimeout(() => { tileQuarter.style.display = 'none'; }, 400);
+            setTimeout(() => { tileEighth1.style.display = 'none'; }, 700);
+            setTimeout(() => { tileEighth2.style.display = 'none'; }, 950);
+        }
+
+        function clearHighlights() {
+            lines.forEach(l => l.classList.remove('playing'));
+        }
+
+        // Play single line audio clip on click
+        lines.forEach(line => {
+            line.addEventListener('click', () => {
+                const audioSrc = line.getAttribute('data-audio');
+                if (audioSrc) {
+                    if (currentAudio) {
+                        currentAudio.pause();
+                        currentAudio.currentTime = 0;
+                    }
+
+                    clearHighlights();
+                    line.classList.add('playing');
+
+                    currentAudio = new Audio(audioSrc);
+                    currentAudio.play();
+
+                    currentAudio.onended = () => {
+                        line.classList.remove('playing');
+                    };
+                }
+            });
+        });
+
+        // Sequential Playback for Full Poem
+        playFullBtn.addEventListener('click', () => {
+            let index = 0;
+
+            function playNextLine() {
+                if (index < lines.length) {
+                    const line = lines[index];
+                    const audioSrc = line.getAttribute('data-audio');
+
+                    clearHighlights();
+                    line.classList.add('playing');
+
+                    if (currentAudio) {
+                        currentAudio.pause();
+                        currentAudio.currentTime = 0;
+                    }
+
+                    currentAudio = new Audio(audioSrc);
+                    currentAudio.play();
+
+                    currentAudio.onended = () => {
+                        line.classList.remove('playing');
+                        index++;
+                        playNextLine();
+                    };
+                }
+            }
+
+            playNextLine();
+        });
+    </script>
+</body>
+</html>
