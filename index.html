@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>poaem</title>
+    <title>Interactive Audio Poem</title>
     <style>
         /* Classic 2000s Web Styling */
         body {
@@ -197,12 +197,12 @@
                 </div>
 
                 <div class="poem-container">
-                    <span class="poem-line" data-audio="audio/line1.mp3">Devour found a lonely ape</span>
-                    <span class="poem-line" data-audio="audio/line2.mp3">Chewed his guts like bone</span>
-                    <span class="poem-line" data-audio="audio/line3.mp3">Swallowed raw inside his deep</span>
-                    <span class="poem-line" data-audio="audio/line4.mp3">Left him all alone</span>
-                    <span class="poem-line" data-audio="audio/line5.mp3">Blood was clotting in his veins</span>
-                    <span class="poem-line" data-audio="audio/line6.mp3">Curdling with a groan</span>
+                    <span class="poem-line" data-audio="line1.mp3">Devour found a lonely ape</span>
+                    <span class="poem-line" data-audio="line2.mp3">Chewed his guts like bone</span>
+                    <span class="poem-line" data-audio="line3.mp3">Swallowed raw inside his deep</span>
+                    <span class="poem-line" data-audio="line4.mp3">Left him all alone</span>
+                    <span class="poem-line" data-audio="line5.mp3">Blood was clotting in his veins</span>
+                    <span class="poem-line" data-audio="line6.mp3">Curdling with a groan</span>
                 </div>
 
                 <div class="controls">
@@ -276,7 +276,7 @@
                     line.classList.add('playing');
 
                     currentAudio = new Audio(audioSrc);
-                    currentAudio.play();
+                    currentAudio.play().catch(e => console.error("Audio playback error:", e));
 
                     currentAudio.onended = () => {
                         line.classList.remove('playing');
@@ -303,7 +303,7 @@
                     }
 
                     currentAudio = new Audio(audioSrc);
-                    currentAudio.play();
+                    currentAudio.play().catch(e => console.error("Audio playback error:", e));
 
                     currentAudio.onended = () => {
                         line.classList.remove('playing');
