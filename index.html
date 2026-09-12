@@ -5,40 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Audio Poem</title>
     <style>
-        /* Classic 2000s Web Styling */
+        /* Plain, low-effort aesthetics matching the minimalist target style */
         body {
-            background-color: #008080;
-            background-image: repeating-linear-gradient(45deg, #007373 0, #007373 10px, #008080 10px, #008080 20px);
+            background-color: #ffffff;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             font-family: "Times New Roman", Times, serif;
-            color: #000;
+            color: #000000;
         }
 
         #page-wrapper {
-            max-width: 800px;
+            width: 100%;
             margin: 0 auto;
-            background-color: #c0c0c0;
-            border: 4px outset #ffffff;
-            padding: 10px;
+            background-color: #ffffff;
+            padding: 0;
         }
 
         #inner-frame {
             background-color: #ffffff;
-            border: 2px inset #7b7b7b;
-            padding: 30px;
+            padding: 0;
             text-align: center;
             position: relative;
         }
 
-        /* Fake 10-Second Loading Screen */
+        /* Minimal loading screen */
         #loading-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #008080;
+            background: #ffffff;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -47,33 +44,32 @@
         }
 
         .loading-box {
-            background: #c0c0c0;
-            border: 3px outset #ffffff;
-            padding: 30px;
+            background: #ffffff;
+            padding: 20px;
             text-align: center;
-            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
             width: 320px;
         }
 
         .loading-box h1 {
-            font-size: 20px;
+            font-size: 24px;
             margin-bottom: 15px;
-            font-weight: bold;
-            color: #000080;
+            font-weight: normal;
+            color: #000000;
         }
 
         .progress-container {
             width: 100%;
-            height: 20px;
+            height: 16px;
             background: #ffffff;
-            border: 2px inset #7b7b7b;
+            border: 1px solid #000000;
             margin-top: 15px;
+            position: relative;
         }
 
         .progress-bar {
             width: 0%;
             height: 100%;
-            background: #000080;
+            background: #2bb62d;
         }
 
         /* Snap-reveal Overlays */
@@ -97,75 +93,79 @@
             width: 100%;
         }
 
-        .header-banner {
-            background: #000080;
-            color: #ffff00;
-            padding: 8px;
-            font-weight: bold;
-            font-size: 22px;
-            margin-bottom: 25px;
-            border: 2px solid #000;
-            width: 100%;
-            box-sizing: border-box;
+        .page-title {
+            font-size: 28px;
+            margin: 25px 0 10px 0;
+            font-weight: normal;
         }
 
-        /* Poem Display Area */
+        /* Plain Poem Display Area */
         .poem-container {
-            font-size: 24px;
-            line-height: 2.2;
+            font-size: 22px;
+            line-height: 2;
             margin: 20px 0;
-            background: #fff8dc;
-            border: 2px solid #000;
-            padding: 25px;
-            width: 80%;
+            background: #ffffff;
+            padding: 10px;
+            width: 90%;
+            max-width: 600px;
             text-align: center;
         }
 
         .poem-line {
             display: block;
             cursor: pointer;
-            padding: 4px 8px;
-            margin: 4px 0;
-            border: 1px transparent solid;
-            transition: background-color 0.1s ease;
+            padding: 4px;
+            margin: 2px 0;
+            transition: color 0.1s ease;
         }
 
         .poem-line:hover {
-            background-color: #ffff00;
-            border: 1px dotted #000;
-            color: #cc0000;
+            color: #2bb62d;
+            text-decoration: underline;
         }
 
         .poem-line.playing {
-            background-color: #ffff00;
-            border: 1px solid #000;
-            color: #cc0000;
+            color: #1f8a20;
+            font-weight: bold;
         }
 
         .controls {
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
+        /* Glossy Pill Play Button Style */
         .btn {
-            background: #c0c0c0;
-            border: 2px outset #ffffff;
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: bold;
+            background: linear-gradient(to bottom, #52d053 0%, #2bb62d 50%, #1f8a20 100%);
+            border: 2px solid #ffffff;
+            outline: 1px solid #1f8a20;
+            border-radius: 25px;
+            padding: 10px 30px;
             cursor: pointer;
-            font-family: "Times New Roman", serif;
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+            box-shadow: 0px 3px 6px rgba(0,0,0,0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .btn:active {
-            border-style: inset;
+        .btn:hover {
+            background: linear-gradient(to bottom, #62e063 0%, #3bc63d 50%, #2fa530 100%);
+        }
+
+        .btn::before {
+            content: '▶';
+            font-size: 16px;
         }
 
         .site-footer {
-            margin-top: 30px;
-            font-size: 12px;
-            color: #555;
-            border-top: 1px dashed #7b7b7b;
-            padding-top: 10px;
+            margin-top: 40px;
+            padding-bottom: 20px;
+            font-size: 14px;
+            color: #000000;
             width: 100%;
         }
     </style>
@@ -174,8 +174,8 @@
 
     <div id="loading-screen">
         <div class="loading-box">
-            <h1>LOADING AUDIO MODULE...</h1>
-            <p id="loading-status">Initializing TTS engine...</p>
+            <h1>LOADING...</h1>
+            <p id="loading-status">loading poem...</p>
             <div class="progress-container">
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
@@ -192,9 +192,7 @@
             <div class="snap-tile" id="tile-eighth-2"></div>
 
             <div id="main-content">
-                <div class="header-banner">
-                    *** INTERACTIVE POEM PLAYER ***
-                </div>
+                <div class="page-title">poem</div>
 
                 <div class="poem-container">
                     <span class="poem-line" data-audio="line1.mp3">Devour found a lonely ape</span>
@@ -206,11 +204,11 @@
                 </div>
 
                 <div class="controls">
-                    <button class="btn" id="play-full-btn">PLAY FULL POEM</button>
+                    <button class="btn" id="play-full-btn">PLAY POEM</button>
                 </div>
 
                 <div class="site-footer">
-                    <p>Click any line to listen to that verse.</p>
+                    <p>click text to play line</p>
                 </div>
             </div>
 
@@ -232,16 +230,16 @@
         const lines = document.querySelectorAll('.poem-line');
         let currentAudio = null;
 
-        // 10-Second Loading Logic
+        // Loading Bar Logic
         let progress = 0;
         const loadInterval = setInterval(() => {
             progress += 1;
             progressBar.style.width = progress + '%';
 
             if (progress === 30) {
-                loadingStatus.textContent = 'Preloading audio clips...';
+                loadingStatus.textContent = 'fetching audio...';
             } else if (progress === 70) {
-                loadingStatus.textContent = 'Building phrase layout...';
+                loadingStatus.textContent = 'almost ready...';
             } else if (progress >= 100) {
                 clearInterval(loadInterval);
                 startSnapReveal();
@@ -262,7 +260,7 @@
             lines.forEach(l => l.classList.remove('playing'));
         }
 
-        // Play single line audio clip on click
+        // Single line audio playback
         lines.forEach(line => {
             line.addEventListener('click', () => {
                 const audioSrc = line.getAttribute('data-audio');
@@ -285,7 +283,7 @@
             });
         });
 
-        // Sequential Playback for Full Poem
+        // Sequential Playback
         playFullBtn.addEventListener('click', () => {
             let index = 0;
 
